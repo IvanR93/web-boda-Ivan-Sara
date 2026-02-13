@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iván & Sara</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#F8F6F2;
+--accent:#E8DDD4;
+--gold:#C6A75E;
+--text:#2C2C2C;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
+overflow-x:hidden;
+line-height:1.6;
+}
+
+img{
+max-width:100%;
+display:block;
+}
+
+.lock{
+position:fixed;
+inset:0;
+background:rgba(255,255,255,0.95);
+backdrop-filter:blur(20px);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+text-align:center;
+padding:20px;
+}
+
+.lock input{
+padding:14px;
+border-radius:40px;
+border:1px solid #ddd;
+margin:8px 0;
+width:100%;
+max-width:280px;
+}
+
+.lock button{
+padding:12px 28px;
+border-radius:40px;
+border:none;
+background:black;
+color:white;
+cursor:pointer;
+}
+
+.hidden{
+opacity:0;
+pointer-events:none;
+transition:1s ease;
+}
+
+.hero{
+position:relative;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+color:white;
+overflow:hidden;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.35);
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+padding:20px;
+animation:fadeUp 1.5s ease forwards;
+opacity:0;
+}
+
+.hero img{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+h1{
+font-family:'Playfair Display',serif;
+font-size:clamp(2.5rem,6vw,4.5rem);
+letter-spacing:2px;
+}
+
+.date{
+margin-top:10px;
+letter-spacing:4px;
+color:var(--gold);
+font-size:clamp(0.9rem,2vw,1rem);
+}
+
+.countdown{
+margin-top:25px;
+font-size:clamp(1rem,2.5vw,1.2rem);
+}
+
+.section{
+padding:80px 20px;
+max-width:900px;
+margin:auto;
+text-align:center;
+opacity:0;
+transform:translateY(40px);
+transition:1s ease;
+}
+
+.section.visible{
+opacity:1;
+transform:translateY(0);
+}
+
+iframe{
+width:100%;
+height:350px;
+border-radius:20px;
+border:none;
+margin-top:25px;
+}
+
+input,select{
+width:100%;
+max-width:400px;
+padding:12px;
+margin:8px auto;
+border-radius:30px;
+border:1px solid #ddd;
+display:block;
+}
+
+button.rsvp{
+margin-top:15px;
+padding:14px 35px;
+border-radius:30px;
+border:none;
+background:black;
+color:white;
+cursor:pointer;
+}
+
+.music{
+position:fixed;
+bottom:20px;
+right:20px;
+width:50px;
+height:50px;
+border-radius:50%;
+background:black;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+z-index:1000;
+}
+
+footer{
+padding:60px 20px;
+text-align:center;
+opacity:.6;
+}
+
+@keyframes fadeUp{
+to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="lock" id="lock">
+<h3>Invitación privada</h3>
+<input type="text" id="guest" placeholder="Tu nombre">
+<input type="password" id="pass" placeholder="Contraseña">
+<button onclick="unlock()">Entrar</button>
+</div>
+
+<audio id="music" loop>
+<source src="https://www.bensound.com/bensound-music/bensound-love.mp3">
+</audio>
+
+<div class="music" onclick="toggleMusic()">♪</div>
+
+<section class="hero">
+<img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf" alt="">
+<div class="hero-content" id="heroContent">
+<h1>Iván & Sara</h1>
+<div class="date">06 · 03 · 2027</div>
+<div class="countdown" id="countdown"></div>
+<div id="welcome"></div>
+</div>
+</section>
+
+<section class="section">
+<h2>Finca La Montaña</h2>
+<p>Aranjuez</p>
+<iframe src="https://www.google.com/maps?q=Finca%20La%20Montaña%20Aranjuez&output=embed"></iframe>
+</section>
+
+<section class="section">
+<h2>Confirmación</h2>
+<input type="text" id="nombre" placeholder="Nombre">
+<input type="email" id="email" placeholder="Email">
+<select id="asistencia">
+<option>Asistiré</option>
+<option>No podré asistir</option>
+</select>
+<input type="number" id="acompanantes" placeholder="Acompañantes">
+<button class="rsvp" onclick="send()">Confirmar asistencia</button>
+</section>
+
+<footer>
+Con amor eterno · Iván & Sara
+</footer>
+
+<script>
+
+// desbloqueo
+function unlock(){
+if(document.getElementById("pass").value==="2027amor"){
+let guest=document.getElementById("guest").value;
+document.getElementById("lock").classList.add("hidden");
+document.getElementById("welcome").innerHTML="Nos alegra que estés aquí, "+guest;
+}
+}
+
+// countdown
+let target=new Date("March 6, 2027").getTime();
+setInterval(()=>{
+let now=new Date().getTime();
+let diff=target-now;
+let d=Math.floor(diff/(1000*60*60*24));
+let h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+let m=Math.floor((diff%(1000*60*60))/(1000*60));
+document.getElementById("countdown").innerHTML=d+" días · "+h+"h · "+m+"m";
+},1000);
+
+// animaciones eficientes
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add('visible');
+}
+});
+},{threshold:0.2});
+
+document.querySelectorAll('.section').forEach(sec=>{
+observer.observe(sec);
+});
+
+// musica
+function toggleMusic(){
+let music=document.getElementById("music");
+music.paused?music.play():music.pause();
+}
+
+// RSVP Google Sheets
+function send(){
+
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwPul-WwI3XI1XGKZ8qFnGB8QdLqjO31FxkzUp9ttRx4ZjdYkSG3h2gO9mDXm1UYpn4SA/exec"; // ← IMPORTANTE
+
+fetch(WEBAPP_URL,{
+method:"POST",
+mode:"cors",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+nombre:document.getElementById("nombre").value,
+email:document.getElementById("email").value,
+asistencia:document.getElementById("asistencia").value,
+acompanantes:document.getElementById("acompanantes").value,
+token:"wedding2027secure"
+})
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.status==="OK"){
+alert("Confirmación enviada 💍");
+}else{
+alert(data.message || "Error al enviar");
+}
+})
+.catch(err=>{
+alert("Error de conexión con el servidor");
+console.error(err);
+});
+
+}
+
+
+</script>
+
+</body>
+</html>
